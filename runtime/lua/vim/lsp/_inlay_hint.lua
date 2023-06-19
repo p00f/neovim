@@ -1,6 +1,11 @@
 local util = require('vim.lsp.util')
 local log = require('vim.lsp.log')
 local api = vim.api
+
+local inlay_hint_kind = {
+  TYPE = 1,
+  PARAMETER = 2,
+}
 local M = {}
 
 ---@class lsp._inlay_hint.bufstate
@@ -268,11 +273,17 @@ api.nvim_set_decoration_provider(namespace, {
           if hint.paddingRight then
             text = text .. ' '
           end
+          local hl_group = 'LspInlayHint'
+          if hint.kind == inlay_hint_kind.TYPE then
+            hl_group = 'LspTypeHint'
+          elseif hint.kind == inlay_hint_kind.PARAMETER then
+            hl_group = 'LspParameterHint'
+          end
           api.nvim_buf_set_extmark(bufnr, namespace, lnum, hint.position.character, {
             virt_text_pos = 'inline',
             ephemeral = false,
             virt_text = {
-              { text, 'LspInlayHint' },
+              { text, hl_group },
             },
             hl_mode = 'combine',
           })
