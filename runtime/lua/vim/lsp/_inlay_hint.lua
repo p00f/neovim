@@ -264,7 +264,7 @@ api.nvim_set_decoration_provider(namespace, {
             virt_text = {
               { text, 'LspInlayHint' },
             },
-            hl_mode = 'combine',
+            -- hl_mode = 'combine',
           })
         end
       end
