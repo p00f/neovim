@@ -315,9 +315,23 @@ pub fn build(b: *std.Build) !void {
     nvim_exe.linkLibrary(libuv);
     nvim_exe.linkLibrary(libluv);
     if (iconv) |dep| nvim_exe.linkLibrary(dep.artifact("iconv"));
-    nvim_exe.linkLibrary(utf8proc.artifact("utf8proc"));
-    if (unibilium) |u| nvim_exe.linkLibrary(u.artifact("unibilium"));
-    nvim_exe.linkLibrary(treesitter.artifact("tree-sitter"));
+    if (b.systemIntegrationOption("utf8proc", .{})) {
+        nvim_exe.root_module.linkSystemLibrary("utf8proc", .{});
+    } else {
+        nvim_exe.root_module.linkLibrary(utf8proc.artifact("utf8proc"));
+    }
+    if (unibilium) |u| {
+        if (b.systemIntegrationOption("unibilium", .{})) {
+            nvim_exe.root_module.linkSystemLibrary("unibilium", .{});
+        } else {
+            nvim_exe.root_module.linkLibrary(u.artifact("unibilium"));
+        }
+    }
+    if (b.systemIntegrationOption("tree-sitter", .{})) {
+        nvim_exe.root_module.linkSystemLibrary("tree-sitter", .{});
+    } else {
+        nvim_exe.root_module.linkLibrary(treesitter.artifact("tree-sitter"));
+    }
     if (is_windows) {
         nvim_exe.linkSystemLibrary("netapi32");
     }
